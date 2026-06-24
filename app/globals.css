@@ -1,0 +1,202 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* CSS font variables are set by next/font via the variable classes on <html>.
+     Do NOT redeclare them here — a duplicate :root rule with equal specificity
+     wins by source order and would replace next/font's generated family names. */
+
+  * {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #0A0A0F;
+    color: #F0EAD6;
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: rgba(201, 168, 76, 0.3);
+    color: #F0EAD6;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0A0A0F;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2A2A3A;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(201, 168, 76, 0.4);
+  }
+}
+
+@layer components {
+  /* Glass card */
+  .glass-card {
+    background: rgba(26, 26, 38, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 12px;
+  }
+
+  /* Gold gradient text */
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #C9A84C 0%, #E8C97A 50%, #A07830 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gold gradient border via pseudo element */
+  .border-gold-gradient {
+    position: relative;
+  }
+
+  .border-gold-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, #C9A84C, #E8C97A, #A07830);
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask-composite: destination-out;
+    pointer-events: none;
+  }
+
+  /* Section divider */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #C9A84C, transparent);
+    opacity: 0.3;
+  }
+
+  /* Islamic tessellation — 8-pointed star pattern */
+  .bg-tessellation {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23C9A84C' fill-opacity='1'%3E%3Cpolygon points='40,5 45,15 55,15 47,22 50,32 40,26 30,32 33,22 25,15 35,15'/%3E%3Cpolygon points='5,40 15,45 15,55 22,47 32,50 26,40 32,30 22,33 15,25 15,35'/%3E%3Cpolygon points='75,40 65,45 65,55 58,47 48,50 54,40 48,30 58,33 65,25 65,35'/%3E%3Cpolygon points='40,75 45,65 55,65 47,58 50,48 40,54 30,48 33,58 25,65 35,65'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 80px 80px;
+    opacity: 0.03;
+  }
+
+  /* Gold glow effect */
+  .glow-gold {
+    box-shadow: 0 0 20px rgba(201, 168, 76, 0.15), 0 0 40px rgba(201, 168, 76, 0.05);
+  }
+
+  .glow-gold-sm {
+    box-shadow: 0 0 10px rgba(201, 168, 76, 0.2);
+  }
+
+  /* Offset for fixed navbar on anchor scroll */
+  section[id] {
+    scroll-margin-top: 80px;
+  }
+
+  /* Section padding */
+  .section-padding {
+    @apply py-24 px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-container {
+    @apply max-w-7xl mx-auto;
+  }
+
+  /* Eyebrow label */
+  .eyebrow {
+    @apply text-xs font-body font-semibold tracking-widest uppercase text-gold;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-body font-semibold text-sm;
+    @apply bg-gold text-bg-base transition-all duration-200;
+    @apply hover:bg-gold-light hover:shadow-lg hover:shadow-gold/20;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base;
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-lg font-body font-semibold text-sm;
+    @apply border border-border text-content hover:border-gold/50 hover:text-gold;
+    @apply transition-all duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base;
+  }
+}
+
+/* ── Hero breathing radial gradient — CSS keyframes ──────────────────── */
+@keyframes breatheGradient {
+  0%, 100% {
+    opacity: 0.5;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+}
+
+@keyframes breatheGradientSlow {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+.animate-breathe-gradient {
+  animation: breatheGradient 6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.animate-breathe-gradient-slow {
+  animation: breatheGradientSlow 9s ease-in-out infinite;
+  transform-origin: center;
+  animation-delay: -3s;
+}
+
+/* ── Ondo-scale typography ─────────────────────────────────────────────── */
+.hero-h1 {
+  font-size: clamp(2.5rem, 7vw, 6.5rem);
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+}
+
+.stats-number {
+  font-size: clamp(3.5rem, 9vw, 7rem);
+  line-height: 1.0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.belief-h1 {
+  font-size: clamp(2.5rem, 5.5vw, 5rem);
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+}
