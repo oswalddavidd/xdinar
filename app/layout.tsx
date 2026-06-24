@@ -3,6 +3,7 @@ import { Cinzel, Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
+import { Web3Provider } from '@/providers/Web3Provider'
 
 const cinzel = Cinzel({
   subsets: ['latin'],
@@ -87,9 +88,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-bg-base text-content font-body antialiased">
-        <Navbar />
-        {children}
-        <Footer />
+        <Web3Provider>
+          <Navbar />
+          {children}
+          <Footer />
+        </Web3Provider>
       </body>
     </html>
   )

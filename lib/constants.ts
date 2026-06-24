@@ -4,6 +4,7 @@ export const NAV_LINKS = [
   { label: 'Roadmap', href: '#roadmap' },
   { label: 'Tokenomics', href: '#tokenomics' },
   { label: 'Features', href: '#features' },
+  { label: 'Staking', href: '/staking' },
   { label: 'Connect', href: '#connect' },
 ]
 

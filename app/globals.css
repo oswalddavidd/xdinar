@@ -200,3 +200,59 @@
   line-height: 1.0;
   letter-spacing: -0.02em;
 }
+
+/* ── Staking page ──────────────────────────────────────────────────────── */
+.progress-bar-track {
+  @apply w-full h-1.5 rounded-full bg-bg-raised overflow-hidden;
+}
+
+.progress-bar-fill {
+  @apply h-full rounded-full transition-all duration-700 ease-out;
+  background: linear-gradient(90deg, #C9A84C, #E8C97A);
+}
+
+.badge-locked {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
+         bg-bg-raised border border-border text-content-dim text-xs font-body;
+}
+
+.badge-ready {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full
+         bg-gold/10 border border-gold/40 text-gold text-xs font-body;
+}
+
+.stake-input {
+  @apply w-full bg-bg-raised border border-border rounded-xl px-5 py-4
+         font-mono text-2xl text-content placeholder:text-content-dim
+         focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/30
+         transition-all duration-200;
+}
+
+.stake-slider {
+  @apply w-full h-1.5 rounded-full appearance-none cursor-pointer;
+  background: linear-gradient(90deg, #C9A84C var(--progress, 0%), #2A2A3A var(--progress, 0%));
+}
+
+.stake-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  @apply w-5 h-5 rounded-full bg-gold border-2 border-bg-base cursor-pointer;
+  box-shadow: 0 0 10px rgba(201,168,76,0.4);
+}
+
+.stake-slider:disabled {
+  @apply opacity-40 cursor-not-allowed;
+}
+
+@keyframes pulseGold {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(201,168,76,0.4); }
+  50%       { box-shadow: 0 0 0 6px rgba(201,168,76,0); }
+}
+
+.animate-pulse-gold {
+  animation: pulseGold 1.8s ease-in-out infinite;
+}
+
+.banner-fade {
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}

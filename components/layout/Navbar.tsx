@@ -1,12 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
 import { cn } from '@/lib/utils'
 
-const SECTION_IDS = NAV_LINKS.map((l) => l.href.replace('#', ''))
+const SECTION_IDS = NAV_LINKS.filter((l) => l.href.startsWith('#')).map((l) => l.href.replace('#', ''))
 
 function Logo({ small = false }: { small?: boolean }) {
   return (
@@ -28,6 +29,7 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const activeId = useScrollSpy(SECTION_IDS, 80)
+  const pathname = usePathname()
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80)
@@ -43,10 +45,19 @@ export function Navbar() {
   }, [])
 
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    if (!href.startsWith('#')) {
+      setMobileOpen(false)
+      return
+    }
     e.preventDefault()
     setMobileOpen(false)
     const el = document.getElementById(href.replace('#', ''))
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function isLinkActive(href: string) {
+    if (href.startsWith('#')) return activeId === href.replace('#', '')
+    return pathname === href
   }
 
   return (
@@ -63,8 +74,7 @@ export function Navbar() {
 
           <ul className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
             {NAV_LINKS.map((link) => {
-              const id = link.href.replace('#', '')
-              const isActive = activeId === id
+              const active = isLinkActive(link.href)
               return (
                 <li key={link.href}>
                   <a
@@ -72,11 +82,11 @@ export function Navbar() {
                     onClick={(e) => handleNavClick(e, link.href)}
                     className={cn(
                       'relative block px-3 py-2 text-sm font-body transition-colors duration-200 rounded hover:text-gold',
-                      isActive ? 'text-gold' : 'text-content-muted'
+                      active ? 'text-gold' : 'text-content-muted'
                     )}
                   >
                     {link.label}
-                    {isActive && <span className="absolute bottom-0 left-3 right-3 h-px bg-gold-gradient" />}
+                    {active && <span className="absolute bottom-0 left-3 right-3 h-px bg-gold-gradient" />}
                   </a>
                 </li>
               )
@@ -84,8 +94,8 @@ export function Navbar() {
           </ul>
 
           <div className="ml-auto flex items-center gap-3">
-            <a href="#" className="hidden sm:inline-flex btn-primary py-2 text-xs">
-              Buy $xDINAR <span aria-hidden>→</span>
+            <a href="/staking" className="hidden sm:inline-flex btn-primary py-2 text-xs">
+              Stake $xDINAR <span aria-hidden>→</span>
             </a>
             <button
               className="md:hidden p-2 text-content-muted hover:text-gold transition-colors"
@@ -115,7 +125,7 @@ export function Navbar() {
 
           <ul className="hidden md:flex items-center gap-0.5">
             {NAV_LINKS.map((link) => {
-              const isActive = activeId === link.href.replace('#', '')
+              const active = isLinkActive(link.href)
               return (
                 <li key={link.href}>
                   <a
@@ -124,7 +134,7 @@ export function Navbar() {
                     className={cn(
                       'block px-2.5 py-1.5 text-xs font-body transition-colors duration-200 rounded-full',
                       'hover:text-gold hover:bg-gold/5',
-                      isActive ? 'text-gold' : 'text-content-muted'
+                      active ? 'text-gold' : 'text-content-muted'
                     )}
                   >
                     {link.label}
@@ -135,10 +145,10 @@ export function Navbar() {
           </ul>
 
           <a
-            href="#"
+            href="/staking"
             className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-body font-semibold bg-gold text-bg-base hover:bg-gold-light transition-colors duration-200 flex-shrink-0"
           >
-            Buy $xDINAR
+            Stake $xDINAR →
           </a>
 
           <button
@@ -162,7 +172,7 @@ export function Navbar() {
         <div className="bg-bg-base/95 backdrop-blur-xl border border-border rounded-2xl px-4 py-4 shadow-xl shadow-black/40">
           <ul className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => {
-              const isActive = activeId === link.href.replace('#', '')
+              const active = isLinkActive(link.href)
               return (
                 <li key={link.href}>
                   <a
@@ -170,7 +180,7 @@ export function Navbar() {
                     onClick={(e) => handleNavClick(e, link.href)}
                     className={cn(
                       'block w-full px-4 py-3 rounded-lg text-sm font-body transition-colors duration-200',
-                      isActive
+                      active
                         ? 'text-gold bg-gold/5 border border-gold/20'
                         : 'text-content-muted hover:text-gold hover:bg-bg-raised'
                     )}
@@ -181,8 +191,8 @@ export function Navbar() {
               )
             })}
             <li className="pt-2">
-              <a href="#" className="btn-primary w-full justify-center" onClick={() => setMobileOpen(false)}>
-                Buy $xDINAR →
+              <a href="/staking" className="btn-primary w-full justify-center" onClick={() => setMobileOpen(false)}>
+                Stake $xDINAR →
               </a>
             </li>
           </ul>
