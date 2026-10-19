@@ -20,7 +20,7 @@ const STEPS = [
     index: '03',
     icon: '💰',
     title: 'Claim',
-    lines: ['When the countdown ends,', 'unstake to receive', 'tokens + rewards.'],
+    lines: ['When the countdown ends,', 'claim tokens + reward.', 'Exit early = no reward.'],
   },
 ]
 

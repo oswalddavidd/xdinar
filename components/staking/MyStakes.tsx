@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useAccount, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { parseEventLogs } from 'viem'
 import { motion } from 'framer-motion'
-import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Loader2, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react'
 import { STAKING_ABI } from '@/lib/abi/xDinarStaking'
 import { net } from '@/lib/chains'
 import { useRefreshStakingData } from '@/hooks/useStaking'
@@ -34,6 +34,106 @@ function useNowSeconds(active: boolean) {
   return now
 }
 
+interface EarlyUnstakeTarget {
+  stakeIndex: number
+  amount: bigint
+  fullReward: bigint
+}
+
+function EarlyUnstakeDialog({
+  target,
+  secondsLeft,
+  unlocked,
+  onCancel,
+  onConfirm,
+}: {
+  target: EarlyUnstakeTarget
+  secondsLeft: number
+  unlocked: boolean
+  onCancel: () => void
+  onConfirm: () => void
+}) {
+  const cancelRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    cancelRef.current?.focus()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onCancel()
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onCancel])
+
+  const principal = `${formatTokenDisplay(target.amount, 4)} ${TOKEN_SYMBOL}`
+  const reward = `${formatTokenDisplay(target.fullReward, 6)} ${TOKEN_SYMBOL}`
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center px-4" onClick={onCancel}>
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="early-unstake-title"
+        aria-describedby="early-unstake-desc"
+        onClick={(e) => e.stopPropagation()}
+        className="relative glass-card w-full max-w-md p-6 border-amber-400/30"
+      >
+        {unlocked ? (
+          <>
+            <h3 id="early-unstake-title" className="font-display font-semibold text-content text-lg mb-3">
+              This stake just unlocked
+            </h3>
+            <p id="early-unstake-desc" className="text-sm font-body text-content-muted mb-6">
+              Nothing is forfeited now. Claim to receive your {principal} principal plus the {reward} reward.
+            </p>
+          </>
+        ) : (
+          <>
+            <h3
+              id="early-unstake-title"
+              className="flex items-center gap-2 font-display font-semibold text-content text-lg mb-3"
+            >
+              <AlertTriangle size={18} className="text-amber-400" /> Unstake early?
+            </h3>
+            <p id="early-unstake-desc" className="text-sm font-body text-content-muted mb-3">
+              {secondsLeft > 0 ? (
+                <>
+                  This stake unlocks in{' '}
+                  <span className="font-mono text-content tabular-nums">{formatCountdown(secondsLeft)}</span>.
+                </>
+              ) : (
+                <>This stake is unlocking now — waiting for the next block.</>
+              )}{' '}
+              Unstaking now returns your <span className="text-content">{principal}</span> principal, but you&apos;ll
+              forfeit the <span className="text-amber-300">{reward}</span> reward.
+            </p>
+            <p className="text-xs font-body text-content-dim mb-6">
+              {secondsLeft > 0
+                ? 'Wait for the countdown to finish to claim the full reward.'
+                : 'Wait a few seconds and you can claim the full reward.'}
+            </p>
+          </>
+        )}
+
+        <div className="flex flex-col-reverse sm:flex-row gap-3">
+          <button ref={cancelRef} onClick={onCancel} className="btn-secondary flex-1 justify-center">
+            {unlocked ? 'Cancel' : 'Keep Staking'}
+          </button>
+          <button
+            onClick={onConfirm}
+            className={cn(
+              'flex-1 justify-center',
+              unlocked
+                ? 'btn-primary'
+                : 'inline-flex items-center px-4 py-2.5 rounded-lg border border-amber-400/50 bg-amber-400/10 text-amber-300 text-sm font-body font-semibold hover:bg-amber-400/20 transition-colors'
+            )}
+          >
+            {unlocked ? 'Claim →' : 'Unstake Early'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function MyStakes({ pools }: { pools: readonly Pool[] | undefined }) {
   const { address, isConnected, chainId: walletChainId } = useAccount()
   const wrongNetwork = isConnected && walletChainId !== net.chain.id
@@ -41,7 +141,11 @@ export function MyStakes({ pools }: { pools: readonly Pool[] | undefined }) {
 
   const [claimingIndex, setClaimingIndex] = useState<number | null>(null)
   const [claimTxHash, setClaimTxHash] = useState<`0x${string}` | undefined>()
-  const [claimResult, setClaimResult] = useState<{ principal: bigint; reward: bigint } | null>(null)
+  const [claimResult, setClaimResult] = useState<{ principal: bigint; reward: bigint; early: boolean } | null>(null)
+  const [confirmTarget, setConfirmTarget] = useState<EarlyUnstakeTarget | null>(null)
+  // Full reward the claiming stake would earn on time — tells a 0 reward from an early exit apart
+  // from one that simply rounds to 0 on a tiny stake.
+  const pendingFullReward = useRef(0n)
   const [claimError, setClaimError] = useState('')
   const [showHistory, setShowHistory] = useState(false)
 
@@ -74,6 +178,8 @@ export function MyStakes({ pools }: { pools: readonly Pool[] | undefined }) {
     return unlockedFlags?.[i]?.result === true
   }
 
+  const closeConfirm = useCallback(() => setConfirmTarget(null), [])
+
   const { writeContractAsync } = useWriteContract()
   const { data: claimReceipt } = useWaitForTransactionReceipt({
     hash: claimTxHash,
@@ -85,7 +191,8 @@ export function MyStakes({ pools }: { pools: readonly Pool[] | undefined }) {
     if (!claimReceipt || claimingIndex === null) return
     const [unstaked] = parseEventLogs({ abi: STAKING_ABI, eventName: 'Unstaked', logs: claimReceipt.logs })
     if (claimReceipt.status === 'success' && unstaked) {
-      setClaimResult({ principal: unstaked.args.principal, reward: unstaked.args.reward })
+      const { principal, reward } = unstaked.args
+      setClaimResult({ principal, reward, early: reward === 0n && pendingFullReward.current > 0n })
     } else {
       setClaimError('Unstake failed on-chain. Please try again.')
     }
@@ -94,7 +201,9 @@ export function MyStakes({ pools }: { pools: readonly Pool[] | undefined }) {
     refresh()
   }, [claimReceipt, claimingIndex, refresh])
 
-  async function handleUnstake(stakeIndex: number) {
+  async function handleUnstake(stakeIndex: number, fullReward: bigint) {
+    pendingFullReward.current = fullReward
+    setConfirmTarget(null)
     setClaimingIndex(stakeIndex)
     setClaimResult(null)
     setClaimError('')
@@ -113,8 +222,8 @@ export function MyStakes({ pools }: { pools: readonly Pool[] | undefined }) {
       setClaimError(
         /User (rejected|denied)/.test(msg)
           ? 'Transaction cancelled.'
-          : msg.includes('Still locked')
-            ? 'Still locked on-chain — try again in a few seconds.'
+          : msg.includes('Already unstaked')
+            ? 'This stake has already been unstaked.'
             : 'Something went wrong. Please try again.'
       )
     }
@@ -128,13 +237,20 @@ export function MyStakes({ pools }: { pools: readonly Pool[] | undefined }) {
         My Stakes
       </h2>
 
-      {claimResult && (
-        <div className="flex items-center gap-2 rounded-xl border border-green-500/30 bg-green-500/5 px-4 py-3 mb-4 text-sm font-body text-green-400">
-          <CheckCircle2 size={16} />
-          Unstaked: {formatTokenDisplay(claimResult.principal, 4)} {TOKEN_SYMBOL} + {formatTokenDisplay(claimResult.reward, 6)}{' '}
-          {TOKEN_SYMBOL} reward returned to your wallet.
-        </div>
-      )}
+      {claimResult &&
+        (claimResult.early ? (
+          <div className="flex items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-400/5 px-4 py-3 mb-4 text-sm font-body text-amber-300">
+            <CheckCircle2 size={16} className="flex-shrink-0" />
+            Unstaked early: {formatTokenDisplay(claimResult.principal, 4)} {TOKEN_SYMBOL} principal returned, reward
+            forfeited.
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 rounded-xl border border-green-500/30 bg-green-500/5 px-4 py-3 mb-4 text-sm font-body text-green-400">
+            <CheckCircle2 size={16} className="flex-shrink-0" />
+            Claimed: {formatTokenDisplay(claimResult.principal, 4)} {TOKEN_SYMBOL} principal +{' '}
+            {formatTokenDisplay(claimResult.reward, 6)} {TOKEN_SYMBOL} reward received.
+          </div>
+        ))}
       {claimError && (
         <div className="flex items-center gap-2 text-red-400 text-sm font-body mb-4">
           <AlertCircle size={14} /> {claimError}
@@ -222,23 +338,25 @@ export function MyStakes({ pools }: { pools: readonly Pool[] | undefined }) {
                   <SwitchNetworkButton compact />
                 ) : (
                   <button
-                    onClick={() => handleUnstake(stake.stakeIndex)}
-                    disabled={!unlocked || claimingIndex !== null}
-                    className={cn(
-                      'w-full justify-center',
+                    onClick={() =>
                       unlocked
-                        ? 'btn-primary disabled:opacity-60 disabled:cursor-not-allowed'
-                        : 'py-2.5 rounded-lg bg-bg-raised text-content-dim text-sm font-body font-medium cursor-not-allowed'
+                        ? handleUnstake(stake.stakeIndex, reward)
+                        : setConfirmTarget({ stakeIndex: stake.stakeIndex, amount: stake.amount, fullReward: reward })
+                    }
+                    disabled={claimingIndex !== null}
+                    className={cn(
+                      'w-full justify-center disabled:opacity-60 disabled:cursor-not-allowed',
+                      unlocked ? 'btn-primary' : 'btn-secondary'
                     )}
                   >
                     {isClaiming ? (
                       <span className="inline-flex items-center gap-2">
-                        <Loader2 size={14} className="animate-spin" /> Unstaking...
+                        <Loader2 size={14} className="animate-spin" /> {unlocked ? 'Claiming...' : 'Unstaking...'}
                       </span>
                     ) : unlocked ? (
-                      'Unstake →'
+                      'Claim →'
                     ) : (
-                      '🔒 Locked'
+                      'Unstake Early'
                     )}
                   </button>
                 )}
@@ -247,6 +365,22 @@ export function MyStakes({ pools }: { pools: readonly Pool[] | undefined }) {
           })}
         </div>
       )}
+
+      {confirmTarget &&
+        (() => {
+          const target = open.find((s) => s.stakeIndex === confirmTarget.stakeIndex)
+          if (!target) return null
+          const targetUnlocked = isUnlocked(target.stakeIndex)
+          return (
+            <EarlyUnstakeDialog
+              target={confirmTarget}
+              secondsLeft={Number(target.unlockTime) - now}
+              unlocked={targetUnlocked}
+              onCancel={closeConfirm}
+              onConfirm={() => handleUnstake(confirmTarget.stakeIndex, confirmTarget.fullReward)}
+            />
+          )
+        })()}
 
       {history.length > 0 && (
         <div className="mt-6">
