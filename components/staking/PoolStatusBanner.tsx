@@ -1,19 +1,13 @@
 'use client'
 
-import { useReadContract } from 'wagmi'
-import { STAKING_ABI } from '@/lib/staking-abi'
-import { bpsToPercent, formatLockDuration } from '@/lib/staking-contract'
-import { net, contractsDeployed } from '@/lib/chains'
+import { contractsDeployed, isTestnet } from '@/lib/chains'
+import { usePools, useStakingGlobals } from '@/hooks/useStaking'
+import { TOKEN_SYMBOL, formatTokenDisplay } from '@/lib/staking-contract'
 import { cn } from '@/lib/utils'
 
 export function PoolStatusBanner() {
-  const { data: pool, isLoading } = useReadContract({
-    address: net.stakingAddress,
-    abi: STAKING_ABI,
-    functionName: 'getPool',
-    chainId: net.chain.id,
-    query: { enabled: contractsDeployed, refetchInterval: 30_000 },
-  })
+  const { pools, isLoading } = usePools()
+  const { rewardTreasury, paused } = useStakingGlobals()
 
   if (!contractsDeployed) return null
 
@@ -23,59 +17,44 @@ export function PoolStatusBanner() {
         <div className="max-w-7xl mx-auto flex items-center gap-6">
           <div className="h-3.5 w-24 bg-bg-raised rounded animate-pulse" />
           <div className="h-3.5 w-20 bg-bg-raised rounded animate-pulse" />
-          <div className="h-3.5 w-16 bg-bg-raised rounded animate-pulse" />
-          <div className="h-2 w-32 bg-bg-raised rounded-full animate-pulse" />
+          <div className="h-3.5 w-32 bg-bg-raised rounded animate-pulse" />
         </div>
       </div>
     )
   }
 
-  const isActive = pool?.isActive ?? false
-  const lockStr = pool ? formatLockDuration(pool.lockDuration) : '—'
-  const aprStr = pool ? bpsToPercent(pool.aprBasisPoints) : '0.00'
-  const maxCap = pool?.maxCap ?? 0n
-  const totalStaked = pool?.totalStaked ?? 0n
-  const fillPct = maxCap > 0n ? Number((totalStaked * 100n) / maxCap) : 0
-  const almostFull = fillPct > 90
+  const openCount = pools?.filter((p) => p.isActive).length ?? 0
 
   return (
     <div className="banner-fade w-full border-b border-gold/20 bg-gold/[0.03] py-3 px-4">
       <div className="max-w-7xl mx-auto sm:px-2 lg:px-4 flex flex-wrap items-center gap-4 sm:gap-8">
         <div className="flex items-center gap-2">
           <span
-            className={cn(
-              'w-2 h-2 rounded-full flex-shrink-0',
-              isActive ? 'bg-green-400 animate-pulse' : 'bg-amber-400'
-            )}
+            className={cn('w-2 h-2 rounded-full flex-shrink-0', paused ? 'bg-amber-400' : 'bg-green-400 animate-pulse')}
           />
           <span className="text-xs font-body font-medium text-content-muted">
-            {isActive ? 'Pool Active' : 'Pool Paused'}
+            {paused ? 'Staking Paused' : 'Staking Live'}
           </span>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-body text-content-dim">Lock Period:</span>
-          <span className="text-xs font-body font-semibold text-content">{lockStr}</span>
+          <span className="text-xs font-body text-content-dim">Open pools:</span>
+          <span className="text-xs font-body font-semibold text-content">
+            {openCount} of {pools?.length ?? 0}
+          </span>
         </div>
 
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-body text-content-dim">APR:</span>
-          <span className="text-xs font-body font-semibold text-gold">{aprStr}%</span>
+          <span className="text-xs font-body text-content-dim">Reward fund:</span>
+          <span className="text-xs font-mono font-semibold text-gold">
+            {rewardTreasury !== undefined ? `${formatTokenDisplay(rewardTreasury, 2)} ${TOKEN_SYMBOL}` : '—'}
+          </span>
         </div>
 
-        <div className="flex items-center gap-3 flex-1 max-w-xs">
-          <span className="text-xs font-body text-content-dim whitespace-nowrap">Capacity:</span>
-          <div className="flex-1 h-1.5 rounded-full bg-bg-raised overflow-hidden">
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${fillPct}%`, background: 'linear-gradient(90deg, #C9A84C, #E8C97A)' }}
-            />
-          </div>
-          <span className="text-xs font-mono text-content-muted whitespace-nowrap">{fillPct}%</span>
-        </div>
-
-        {almostFull && (
-          <span className="text-xs font-body text-amber-400">⚠ Almost full</span>
+        {isTestnet && (
+          <span className="text-xs font-body text-amber-300/90">
+            Demo pools: lock periods are minutes long so you can watch them unlock live.
+          </span>
         )}
       </div>
     </div>

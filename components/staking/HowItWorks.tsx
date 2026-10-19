@@ -14,13 +14,13 @@ const STEPS = [
     index: '02',
     icon: '🔒',
     title: 'Stake',
-    lines: ['Enter amount,', 'confirm tx.', 'Tokens locked.'],
+    lines: ['Pick a pool,', 'enter amount,', 'confirm tx.'],
   },
   {
     index: '03',
     icon: '💰',
     title: 'Claim',
-    lines: ['After the lock period ends,', 'claim your staked tokens', 'and rewards.'],
+    lines: ['When the countdown ends,', 'unstake to receive', 'tokens + rewards.'],
   },
 ]
 

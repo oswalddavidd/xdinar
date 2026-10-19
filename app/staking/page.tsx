@@ -1,13 +1,12 @@
 import type { Metadata } from 'next'
 import { PoolStatusBanner } from '@/components/staking/PoolStatusBanner'
-import { StakingCalculator } from '@/components/staking/StakingCalculator'
-import { MyStakes } from '@/components/staking/MyStakes'
+import { StakingDashboard } from '@/components/staking/StakingDashboard'
 import { HowItWorks } from '@/components/staking/HowItWorks'
 
 export const metadata: Metadata = {
   title: 'Stake $xDINAR — Earn Rewards',
   description:
-    'Lock your $xDINAR and earn staking rewards. Fixed lock period, transparent on-chain staking on BNB Smart Chain.',
+    'Lock your $xDINAR and earn staking rewards. Choose a pool, watch your lock count down, and unstake on-chain on BNB Smart Chain.',
 }
 
 export default function StakingPage() {
@@ -31,13 +30,7 @@ export default function StakingPage() {
           </p>
         </div>
 
-        <div className="mb-24">
-          <StakingCalculator />
-        </div>
-
-        <div className="mb-24">
-          <MyStakes />
-        </div>
+        <StakingDashboard />
 
         <div className="mb-24">
           <HowItWorks />
