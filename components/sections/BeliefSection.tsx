@@ -6,18 +6,18 @@ import { motion, useInView, AnimatePresence } from 'framer-motion'
 const BELIEFS = [
   {
     index: '01',
-    heading: 'Sound Money',
-    body: 'Backed by the principle of intrinsic value, rooted in 14 centuries of Dinar heritage. Every $xDINAR is designed to hold meaning, not just market cap.',
+    heading: 'Intrinsic Value',
+    body: 'Inspired by 14 centuries of Dinar heritage as a time-tested standard of value.',
   },
   {
     index: '02',
-    heading: 'Open Finance',
-    body: 'No banks. No borders. Every wallet has equal access to yield, credit, and payments — whether you are in Jakarta, Lagos, or London.',
+    heading: 'Transparency',
+    body: 'Supply, burns, and treasury activity are recorded on-chain and publicly verifiable.',
   },
   {
     index: '03',
-    heading: 'Community Governance',
-    body: 'Every $xDINAR holder has a voice. The protocol evolves by the will of its community through transparent, on-chain governance.',
+    heading: 'Inclusivity',
+    body: 'A fair, open DeFi ecosystem for users from every background.',
   },
 ]
 

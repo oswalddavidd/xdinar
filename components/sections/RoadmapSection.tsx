@@ -2,13 +2,10 @@
 
 import { useEffect, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { Check } from 'lucide-react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ROADMAP } from '@/lib/constants'
 import { cn } from '@/lib/utils'
-
-type Status = 'completed' | 'active' | 'upcoming'
 
 const containerVariants = {
   hidden: {},
@@ -18,28 +15,6 @@ const containerVariants = {
 const cardVariants = {
   hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] as const } },
-}
-
-function StatusBadge({ status }: { status: Status }) {
-  if (status === 'completed') {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-gold/10 border border-gold/30 text-gold text-xs font-body">
-        <Check size={10} /> Completed
-      </span>
-    )
-  }
-  if (status === 'active') {
-    return (
-      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gold/10 border border-gold/40 text-gold text-xs font-body">
-        <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" /> Active
-      </span>
-    )
-  }
-  return (
-    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-border text-content-dim text-xs font-body">
-      Upcoming
-    </span>
-  )
 }
 
 export function RoadmapSection() {
@@ -111,8 +86,6 @@ export function RoadmapSection() {
           >
             {ROADMAP.map((phase, i) => {
               const isLeft = i % 2 === 0
-              const isCompleted = phase.status === 'completed'
-              const isActive = phase.status === 'active'
 
               return (
                 <motion.div
@@ -121,44 +94,29 @@ export function RoadmapSection() {
                   className="relative lg:grid lg:grid-cols-2 lg:gap-8 lg:mb-10"
                 >
                   <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 top-6 z-10">
-                    <div
-                      className={cn(
-                        'w-4 h-4 rounded-full border-2 flex items-center justify-center',
-                        isCompleted ? 'border-gold bg-gold' : isActive ? 'border-gold bg-bg-base animate-pulse' : 'border-border bg-bg-base'
-                      )}
-                    >
-                      {isCompleted && <Check size={8} className="text-bg-base" strokeWidth={3} />}
-                    </div>
+                    <div className="w-4 h-4 rounded-full border-2 border-gold/60 bg-bg-base" />
                   </div>
 
                   <div className={cn(isLeft ? 'lg:col-start-1 lg:pr-12' : 'lg:col-start-2 lg:pl-12', 'w-full')}>
-                    <div
-                      className={cn(
-                        'glass-card p-6 transition-all duration-300',
-                        isActive && 'border-gold/40 glow-gold-sm',
-                        isCompleted && 'border-gold/25',
-                        !isActive && !isCompleted && 'opacity-60'
-                      )}
-                    >
-                      <div className="flex items-start justify-between gap-4 mb-4">
+                    <div className="glass-card p-6 transition-all duration-300 hover:border-gold/30">
+                      <div className="mb-4">
                         <div>
                           <div className="flex items-center gap-2 mb-1">
                             <span className="font-mono text-xs text-content-dim">{phase.phase}</span>
                             <span className="text-border">·</span>
                             <span className="font-mono text-xs text-content-dim">{phase.period}</span>
                           </div>
-                          <h3 className={cn('font-display font-semibold text-xl', isCompleted || isActive ? 'text-content' : 'text-content-dim')}>
+                          <h3 className="font-display font-semibold text-xl text-content">
                             {phase.title}
                           </h3>
                         </div>
-                        <StatusBadge status={phase.status} />
                       </div>
 
                       <ul className="flex flex-col gap-2">
                         {phase.items.map((item) => (
                           <li key={item} className="flex items-start gap-2">
-                            <span className={cn('flex-shrink-0 w-1 h-1 rounded-full mt-2', isCompleted ? 'bg-gold' : isActive ? 'bg-gold/60' : 'bg-border')} />
-                            <span className={cn('text-sm font-body leading-snug', isCompleted || isActive ? 'text-content-muted' : 'text-content-dim')}>
+                            <span className="flex-shrink-0 w-1 h-1 rounded-full mt-2 bg-gold/60" />
+                            <span className="text-sm font-body leading-snug text-content-muted">
                               {item}
                             </span>
                           </li>

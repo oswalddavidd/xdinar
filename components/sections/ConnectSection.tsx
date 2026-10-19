@@ -3,7 +3,7 @@
 import { useRef, useState, type FormEvent } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Mail, BookOpen, Send, MessageCircle, Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
-import { SOCIALS } from '@/lib/constants'
+import { SOCIALS, WHITEPAPER_URL } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 
 function GithubIcon({ size = 18 }: { size?: number }) {
@@ -31,14 +31,17 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   mail: <Mail size={18} />,
 }
 
+// Links still set to '#' are hidden until the real URL exists (copy sheet #38).
+const isLive = (href: string) => href !== '#'
+
 const FOOTER_COLS = [
   {
-    heading: 'Invest',
+    heading: 'Products',
     links: [
-      { label: '$xDINAR', href: '#' },
-      { label: 'Staking', href: '#' },
-      { label: 'Lending', href: '#' },
-      { label: 'Pay', href: '#' },
+      { label: '$xDINAR', href: '#tokenomics' },
+      { label: 'Staking', href: '/staking' },
+      { label: 'Lending', href: '#features' },
+      { label: 'Pay', href: '#features' },
     ],
   },
   {
@@ -53,7 +56,7 @@ const FOOTER_COLS = [
   {
     heading: 'Explore',
     links: [
-      { label: 'Whitepaper', href: '#' },
+      { label: 'Whitepaper', href: WHITEPAPER_URL },
       { label: 'Audit Report', href: '#' },
       { label: 'Smart Contracts', href: '#' },
     ],
@@ -66,6 +69,17 @@ const FOOTER_COLS = [
     ],
   },
 ]
+  .map((col) => ({ ...col, links: col.links.filter((l) => isLive(l.href)) }))
+  .filter((col) => col.links.length > 0)
+
+const LIVE_SOCIALS = SOCIALS.filter((s) => isLive(s.href))
+
+const FOOTER_GRID_COLS: Record<number, string> = {
+  1: 'md:grid-cols-1',
+  2: 'md:grid-cols-2',
+  3: 'md:grid-cols-3',
+  4: 'md:grid-cols-4',
+}
 
 type FormState = 'idle' | 'loading' | 'success' | 'error'
 
@@ -126,7 +140,7 @@ export function ConnectSection() {
           transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }}
           className="flex items-center justify-center gap-6 mb-8"
         >
-          {SOCIALS.map((social) => (
+          {LIVE_SOCIALS.map((social) => (
             <a
               key={social.platform}
               href={social.href}
@@ -158,7 +172,7 @@ export function ConnectSection() {
           <div className="relative z-10 px-8 py-16 sm:px-16 sm:py-20 text-center max-w-2xl mx-auto">
             <p className="eyebrow mb-4">Stay Connected</p>
             <h2 className="font-display font-bold text-content mb-3 leading-tight" style={{ fontSize: 'clamp(1.75rem, 4vw, 3rem)' }}>
-              The Future of Islamic Finance
+              Stay Updated on xDINAR
             </h2>
             <p className="text-content-muted font-body text-base mb-8 leading-relaxed">
               Subscribe for launch alerts, governance proposals, and protocol updates straight to your
@@ -207,13 +221,16 @@ export function ConnectSection() {
             </form>
 
             <div className="flex items-center justify-center gap-5">
-              {[
-                { icon: <XIcon size={16} />, label: 'Twitter/X' },
-                { icon: <GithubIcon size={16} />, label: 'GitHub' },
-                { icon: <Send size={16} />, label: 'Telegram' },
-              ].map((s) => (
-                <a key={s.label} href="#" aria-label={s.label} className="text-content-dim hover:text-gold transition-colors duration-200">
-                  {s.icon}
+              {LIVE_SOCIALS.filter((s) => ['twitter', 'github', 'telegram'].includes(s.icon)).map((s) => (
+                <a
+                  key={s.platform}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.platform}
+                  className="text-content-dim hover:text-gold transition-colors duration-200"
+                >
+                  {ICON_MAP[s.icon]}
                 </a>
               ))}
             </div>
@@ -225,7 +242,7 @@ export function ConnectSection() {
           ref={footerRef}
           animate={footerInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 24 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] as const }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-8 border-t border-border/50"
+          className={cn('grid grid-cols-2 gap-8 pt-8 border-t border-border/50', FOOTER_GRID_COLS[FOOTER_COLS.length])}
         >
           {FOOTER_COLS.map((col) => (
             <div key={col.heading}>
@@ -235,6 +252,7 @@ export function ConnectSection() {
                   <li key={link.label}>
                     <a
                       href={link.href}
+                      {...(link.href === WHITEPAPER_URL && { target: '_blank', rel: 'noopener noreferrer' })}
                       className="text-content-muted text-sm font-body hover:text-gold transition-colors duration-200"
                     >
                       {link.label}

@@ -17,9 +17,10 @@ const itemVariants = {
 }
 
 const PROBLEMS = [
-  { icon: '🔥', problem: 'Extreme Volatility', solution: 'Automated Burning reduces supply pressure on every transaction' },
-  { icon: '🌍', problem: 'No Cultural Relevance', solution: 'Rooted in Dinar — resonating with 1.8B Muslim market globally' },
-  { icon: '🔧', problem: 'High Barriers to Entry', solution: 'Simple UX + community education programs lower the threshold' },
+  { icon: '🔥', problem: 'Excessive Volatility', solution: 'Automatic burning mechanism to maintain supply stability' },
+  { icon: '🌍', problem: 'Lack of Cultural Relevance', solution: 'Dinar values and philosophy integrated into protocol design' },
+  { icon: '🔧', problem: 'Technical Complexity', solution: 'User-friendly UI/UX and intensive community education' },
+  { icon: '💧', problem: 'Liquidity Limitations', solution: 'Dedicated 10% liquidity pool allocation from total supply' },
 ]
 
 const ORBIT_ITEMS = [
@@ -65,8 +66,7 @@ function OrbitalVisual() {
           })}
         </g>
         <circle cx={cx} cy={cy} r="40" fill="rgba(26,26,38,0.9)" stroke="rgba(201,168,76,0.25)" strokeWidth="1" />
-        <text x={cx} y={cy - 6} textAnchor="middle" fontSize="20" fontWeight="700" fontFamily="Cinzel, serif" fill="#C9A84C">x</text>
-        <text x={cx} y={cy + 10} textAnchor="middle" fontSize="7" letterSpacing="4" fontFamily="Cinzel, serif" fill="rgba(201,168,76,0.6)">DINAR</text>
+        <image href="/logo.png" x={cx - 23} y={cy - 20} width="46" height="40" />
       </svg>
     </div>
   )
@@ -103,17 +103,17 @@ export function AboutSection() {
               <span className="text-gold-gradient">Powered by DeFi.</span>
             </h2>
             <p className="text-content-muted font-body text-lg leading-relaxed mb-10">
-              xDINAR is a decentralized finance protocol that draws its identity from the Islamic gold
-              Dinar — a symbol of sound money for over a millennium. We combine that cultural heritage
-              with the transparency, composability, and permissionlessness of modern DeFi on BNB Smart
-              Chain.
+              xDINAR is a decentralized finance protocol built on BNB Smart Chain. Inspired by the Dinar —
+              a monetary unit used for over 14 centuries and historically grounded in precious metals — we
+              bring its principle of intrinsic value into modern blockchain infrastructure to build a
+              financial ecosystem that is inclusive, transparent, and sovereign for its users.
             </p>
 
             <motion.div
               ref={problemsRef}
               variants={containerVariants}
               animate={problemsInView ? 'visible' : 'hidden'}
-              className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
               {PROBLEMS.map((item) => (
                 <motion.div key={item.problem} variants={itemVariants} className="glass-card p-4 flex flex-col gap-3">

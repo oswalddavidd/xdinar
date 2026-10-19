@@ -20,7 +20,7 @@ const STEPS = [
     index: '03',
     icon: '💰',
     title: 'Claim',
-    lines: ['After lock ends,', 'claim principal', '+ all rewards.'],
+    lines: ['After the lock period ends,', 'claim your staked tokens', 'and rewards.'],
   },
 ]
 

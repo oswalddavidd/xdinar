@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { HERO_STATS } from '@/lib/constants'
+import { HERO_STATS, WHITEPAPER_URL } from '@/lib/constants'
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 28 },
@@ -17,7 +17,7 @@ export function HeroSection() {
   const heroPanelRef = useRef<HTMLDivElement>(null)
   const h1LeftRef = useRef<HTMLSpanElement>(null)
   const h1RightRef = useRef<HTMLSpanElement>(null)
-  const glowRevealRef = useRef<HTMLDivElement>(null)
+  const glowRevealRef = useRef<HTMLSpanElement>(null)
   const subContentRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -97,15 +97,28 @@ export function HeroSection() {
             Decentralized Finance · BNB Smart Chain
           </motion.p>
 
+          <motion.p
+            {...fadeUp(0.15)}
+            aria-hidden
+            className="font-display font-bold text-gold-gradient tracking-[0.15em] mb-3"
+            style={{ fontSize: 'clamp(1.25rem, 2.5vw, 2rem)' }}
+          >
+            xDINAR
+          </motion.p>
+
           {/* Split H1 */}
-          <div className="flex flex-wrap items-center justify-center gap-4 lg:gap-6 mb-6">
-            <span ref={h1LeftRef} className="inline-block hero-h1 font-display font-bold text-content">
-              Evolusi Keuangan
+          <h1
+            aria-label="xDINAR — The Evolution of Decentralized Finance"
+            className="flex flex-wrap items-center justify-center gap-4 lg:gap-6 mb-6"
+          >
+            <span ref={h1LeftRef} aria-hidden className="inline-block hero-h1 font-display font-bold text-content">
+              The Evolution of
             </span>
 
             {/* Gold reveal between the two words */}
-            <div
+            <span
               ref={glowRevealRef}
+              aria-hidden
               className="hidden lg:flex items-center justify-center w-40 h-20 xl:w-52 xl:h-24 rounded-2xl border border-gold/20 overflow-hidden flex-shrink-0"
               style={{
                 opacity: 0,
@@ -113,16 +126,14 @@ export function HeroSection() {
                 boxShadow: 'inset 0 0 40px rgba(201,168,76,0.1)',
               }}
             >
-              <div className="flex flex-col items-center gap-1">
-                <span className="font-display font-bold text-2xl text-gold-gradient leading-none">x</span>
-                <span className="font-display text-[9px] text-gold/60 tracking-[0.3em] uppercase">DINAR</span>
-              </div>
-            </div>
-
-            <span ref={h1RightRef} className="inline-block hero-h1 font-display font-bold text-gold-gradient">
-              Terdesentralisasi
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.png" alt="" className="h-12 xl:h-14 w-auto" />
             </span>
-          </div>
+
+            <span ref={h1RightRef} aria-hidden className="inline-block hero-h1 font-display font-bold text-gold-gradient">
+              Decentralized Finance
+            </span>
+          </h1>
 
           {/* Subtitle + CTA + Stats */}
           <div ref={subContentRef}>
@@ -130,15 +141,15 @@ export function HeroSection() {
               {...fadeUp(0.25)}
               className="text-content-muted font-body text-lg lg:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
             >
-              xDINAR merupakan protokol DeFi yang menggabungkan warisan nilai Dinar Islam dengan
-              keuangan terdesentralisasi modern — terbuka, transparan, dan berbasis komunitas.
+              Driving the evolution of decentralized finance by bringing the time-tested value of the
+              Dinar into a next-generation DeFi ecosystem on BNB Smart Chain.
             </motion.p>
 
             <motion.div {...fadeUp(0.35)} className="flex flex-wrap items-center justify-center gap-4 mb-14">
               <a href="#about" className="btn-primary">
                 Explore Protocol →
               </a>
-              <a href="#" className="btn-secondary">
+              <a href={WHITEPAPER_URL} target="_blank" rel="noopener noreferrer" className="btn-secondary">
                 Read Whitepaper
               </a>
             </motion.div>

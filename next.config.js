@@ -15,6 +15,11 @@ const nextConfig = {
   images: { formats: ['image/avif', 'image/webp'] },
   compress: true,
   poweredByHeader: false,
+  async redirects() {
+    return [
+      { source: '/whitepaper', destination: 'https://xdinar-token.gitbook.io/xdinar-token-docs', permanent: false },
+    ]
+  },
   async headers() {
     if (isDev) return []
     return [{ source: '/(.*)', headers: securityHeaders }]

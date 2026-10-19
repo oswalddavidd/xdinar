@@ -83,8 +83,8 @@ export function EcosystemArcSection() {
               <span className="text-gold-gradient">Between Dinar & DeFi</span>
             </h2>
             <p className="text-content-muted font-body text-lg mb-8 leading-relaxed">
-              We&apos;re building the infrastructure for a new era of Islamic-inspired decentralized
-              finance — open, transparent, and culturally rooted.
+              We&apos;re building an integrated, all-in-one DeFi ecosystem inspired by the Dinar — open,
+              transparent, and culturally rooted.
             </p>
             <a href="#features" className="btn-secondary">
               Explore Features →

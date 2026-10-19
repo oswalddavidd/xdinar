@@ -69,19 +69,19 @@ export function StatsSection() {
             className="lg:sticky lg:top-32"
           >
             <p className="font-display font-bold text-content leading-tight" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}>
-              xDINAR is building
+              xDINAR is building DeFi
             </p>
             <p className="font-display font-bold text-content-muted leading-tight mt-1" style={{ fontSize: 'clamp(1.75rem, 4vw, 2.75rem)' }}>
-              the future of Islamic DeFi.
+              rooted in the value of the Dinar.
             </p>
             <p className="text-content-dim font-body text-base mt-6 leading-relaxed max-w-sm">
-              Built on BNB Smart Chain. Rooted in 14 centuries of Dinar heritage. Open to every wallet
-              on earth.
+              Built on BNB Smart Chain. Rooted in 14 centuries of Dinar heritage. Open to users from all
+              backgrounds.
             </p>
           </motion.div>
 
           <div className="flex flex-col divide-y divide-border">
-            <CountRow end={500000} label="Max Supply" delay={0} suffix=" xDINAR" />
+            <CountRow end={500000} label="Max Supply" delay={0} />
             <CountRow end={5} label="Core Products" delay={0.08} />
             <TextRow value="BEP-20" label="Token Standard" delay={0.16} />
           </div>

@@ -194,16 +194,17 @@ export function TokenomicsSection() {
                 <p className="text-content-dim text-xs font-body">Deflationary by design</p>
               </div>
             </div>
+            {/* Burn rates intentionally not shown until confirmed by the smart contract team (copy sheet #29). */}
             <ul className="flex flex-col gap-3">
               {[
-                { trigger: 'Every Transaction', rate: '2% burned' },
-                { trigger: 'Swap Volume', rate: '0.5% of each swap' },
-                { trigger: 'Early Staking Exit', rate: '5% penalty burned' },
-                { trigger: 'Treasury Revenue', rate: 'Quarterly burn events' },
+                'Every ecosystem transaction contributes to supply reduction',
+                'Circulating supply decreases as usage grows',
+                'Quarterly burn events',
+                'All burns recorded on-chain & publicly verifiable',
               ].map((item) => (
-                <li key={item.trigger} className="flex items-center justify-between gap-4 py-2 border-b border-border/50 last:border-0">
-                  <span className="text-content-muted text-sm font-body">{item.trigger}</span>
-                  <span className="text-gold text-sm font-mono font-medium">{item.rate}</span>
+                <li key={item} className="flex items-start gap-3 py-2 border-b border-border/50 last:border-0">
+                  <span className="flex-shrink-0 w-1 h-1 rounded-full mt-2 bg-gold" />
+                  <span className="text-content-muted text-sm font-body">{item}</span>
                 </li>
               ))}
             </ul>
@@ -221,14 +222,14 @@ export function TokenomicsSection() {
             </div>
             <ul className="flex flex-col gap-3">
               {[
-                { label: 'Hard Cap', value: '500,000 xDINAR' },
-                { label: 'Staking Rewards', value: 'Programmatic only' },
-                { label: 'DAO Mint', value: '67% supermajority' },
-                { label: 'Ecosystem Grants', value: 'Governance approval' },
+                { label: 'Max Supply', value: '500,000 $xDINAR' },
+                { label: 'Staking Rewards', value: 'Controlled by emission schedule' },
+                { label: 'Governance Mint', value: 'Community vote, 67% supermajority' },
+                { label: 'Ecosystem Grants', value: 'Capped by Ecosystem allocation' },
               ].map((item) => (
                 <li key={item.label} className="flex items-center justify-between gap-4 py-2 border-b border-border/50 last:border-0">
                   <span className="text-content-muted text-sm font-body">{item.label}</span>
-                  <span className="text-accent text-sm font-mono font-medium">{item.value}</span>
+                  <span className="text-accent text-sm font-mono font-medium text-right">{item.value}</span>
                 </li>
               ))}
             </ul>

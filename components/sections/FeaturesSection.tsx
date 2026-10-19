@@ -40,8 +40,8 @@ export function FeaturesSection() {
             Everything You Need in <span className="text-gold-gradient">One Protocol</span>
           </h2>
           <p className="text-content-muted font-body text-lg mt-4 max-w-2xl mx-auto">
-            A complete DeFi suite — from trading and staking to lending and payments — all built on
-            transparent, audited smart contracts.
+            A complete DeFi suite — trading, staking, lending, payments, and governance — built on
+            transparent smart contracts.
           </p>
         </motion.div>
 

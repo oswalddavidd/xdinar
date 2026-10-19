@@ -28,17 +28,17 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://xdinar.io'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://xdinar.vercel.app'),
   title: 'xDINAR — DeFi Protocol on BNB Smart Chain',
   description:
     'xDINAR bridges the timeless value of the Dinar with the power of decentralized finance. Swap, stake, lend, and pay — built on BNB Smart Chain.',
-  keywords: ['xDINAR', 'DeFi', 'BNB Smart Chain', 'BEP-20', 'Dinar', 'Islamic Finance', 'staking', 'token'],
+  keywords: ['xDINAR', 'DeFi', 'BNB Smart Chain', 'BEP-20', 'Dinar', 'staking', 'token'],
   authors: [{ name: 'xDINAR Team' }],
   creator: 'xDINAR',
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: process.env.NEXT_PUBLIC_APP_URL ?? 'https://xdinar.io',
+    url: process.env.NEXT_PUBLIC_APP_URL ?? 'https://xdinar.vercel.app',
     siteName: 'xDINAR',
     title: 'xDINAR — DeFi Protocol on BNB Smart Chain',
     description:
@@ -72,7 +72,8 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    apple: '/logo.png',
   },
 }
 

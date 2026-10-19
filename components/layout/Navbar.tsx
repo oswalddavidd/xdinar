@@ -12,12 +12,13 @@ const SECTION_IDS = NAV_LINKS.filter((l) => l.href.startsWith('#')).map((l) => l
 function Logo({ small = false }: { small?: boolean }) {
   return (
     <div className="flex items-center gap-2 group">
-      <div className={cn('relative rounded-full flex-shrink-0', small ? 'w-6 h-6' : 'w-7 h-7')}>
-        <div className="absolute inset-0 rounded-full bg-gold/20 group-hover:bg-gold/30 transition-colors duration-200" />
-        <div className="absolute inset-[3px] rounded-full border border-gold/60 flex items-center justify-center">
-          <span className={cn('text-gold font-display font-bold leading-none', small ? 'text-[9px]' : 'text-[10px]')}>x</span>
-        </div>
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo.png"
+        alt=""
+        aria-hidden
+        className={cn('flex-shrink-0 w-auto transition-opacity duration-200 group-hover:opacity-90', small ? 'h-6' : 'h-8')}
+      />
       <span className={cn('font-display font-bold text-gold-gradient', small ? 'text-xs' : 'text-sm hidden sm:block')}>
         xDINAR
       </span>

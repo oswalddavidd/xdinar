@@ -8,97 +8,88 @@ export const NAV_LINKS = [
   { label: 'Connect', href: '#connect' },
 ]
 
+// Status labels intentionally omitted until progress is verified (copy sheet #17).
 export const ROADMAP = [
   {
     phase: 'Phase 1',
-    period: 'Q1 2024',
+    period: 'Q1 2026',
     title: 'Foundation',
-    status: 'completed' as const,
     items: [
-      'Token contract deployed on BSC',
-      'Smart contract audit initiated',
-      'Core team assembled',
-      'Whitepaper v1 published',
-      'Community channels launched',
+      'Finalize whitepaper & technical documentation',
+      'Develop & audit the xDINAR smart contract (BEP-20)',
+      'Core team building & advisor recruitment',
+      'Official website & social launch · Seed round',
     ],
   },
   {
     phase: 'Phase 2',
-    period: 'Q2 2024',
+    period: 'Q2 2026',
     title: 'Launch',
-    status: 'completed' as const,
     items: [
-      'Public token sale & IDO',
-      'DEX listing on PancakeSwap',
-      'Staking contract deployed',
-      'Initial liquidity provisioned',
-      'Marketing campaign Phase 1',
+      '$xDINAR token launch on BNB Smart Chain',
+      'Listing on prominent DEX (PancakeSwap, etc.)',
+      'Launch xDINAR Staking v1 · Private & Public sale',
+      'Liquidity pool launch with 10% allocation',
     ],
   },
   {
     phase: 'Phase 3',
-    period: 'Q3 2024',
+    period: 'Q3 2026',
     title: 'Growth',
-    status: 'active' as const,
     items: [
-      'xDINAR Swap launch (AMM)',
-      'Lending protocol beta',
-      'DAO governance activation',
-      'CEX listing applications',
-      'Community ambassador program',
+      'Launch xDINAR Swap (proprietary DEX)',
+      'Launch Lending & Borrowing protocol',
+      'Listing on tier-2 CEX · Ambassador program',
+      'First quarterly burn',
     ],
   },
   {
     phase: 'Phase 4',
-    period: 'Q4 2024',
+    period: 'Q4 2026',
     title: 'Expansion',
-    status: 'upcoming' as const,
     items: [
-      'xDINAR Pay merchant gateway',
-      'Mobile wallet (iOS & Android)',
-      'Cross-chain bridge (ETH / Polygon)',
-      'Institutional partnerships',
-      'Regional market expansion',
+      'Launch xDINAR Pay (payment gateway)',
+      'DAO Governance implementation · Tier-1 CEX listing',
+      'Expansion into SEA & Middle Eastern markets',
+      'Partnerships with Islamic financial institutions',
     ],
   },
   {
     phase: 'Phase 5',
-    period: '2025+',
+    period: '2027+',
     title: 'Ecosystem Maturity',
-    status: 'upcoming' as const,
     items: [
-      'Full DAO governance transition',
-      'xDINAR Foundation established',
-      'Real-world asset (RWA) integration',
-      'Multi-chain presence',
-      'Global DeFi protocol status',
+      'xDINAR mobile app · Cross-chain integration',
+      'Launch xDINAR Academy (DeFi education)',
+      'Global expansion & institutional adoption',
+      'Governance-based protocol review & upgrades',
     ],
   },
 ]
 
 export const TOKENOMICS = [
-  { label: 'Ecosystem', pct: 40, amount: 200000, color: '#C9A84C', desc: 'Protocol rewards, staking, and grants' },
-  { label: 'Investor', pct: 20, amount: 100000, color: '#E8C97A', desc: '12-month vesting, 3-month cliff' },
-  { label: 'Marketing & Ops', pct: 20, amount: 100000, color: '#2A6FDB', desc: 'Growth, partnerships, and operations' },
-  { label: 'Treasury', pct: 10, amount: 50000, color: '#504840', desc: 'DAO-controlled, multi-sig secured' },
-  { label: 'Liquidity', pct: 10, amount: 50000, color: '#2A2A3A', desc: 'DEX liquidity pools and market making' },
+  { label: 'Ecosystem', pct: 40, amount: 200000, color: '#C9A84C', desc: 'Product development, grants, partnerships & staking incentives' },
+  { label: 'Investor', pct: 20, amount: 100000, color: '#E8C97A', desc: 'Seed, Private & Public Sale' },
+  { label: 'Marketing & Ops', pct: 20, amount: 100000, color: '#2A6FDB', desc: 'Marketing, listings & operations' },
+  { label: 'Treasury', pct: 10, amount: 50000, color: '#504840', desc: 'Reserve fund & governance, managed by the DAO' },
+  { label: 'Liquidity', pct: 10, amount: 50000, color: '#2A2A3A', desc: 'DEX liquidity pool' },
 ]
 
 export const FEATURES = [
   {
     icon: '🔄',
     title: 'xDINAR Swap',
-    desc: 'Decentralized AMM exchange. Swap $xDINAR for any BEP-20 token with minimal fees and zero middlemen.',
+    desc: 'Decentralized AMM exchange. Swap $xDINAR with other BEP-20 tokens directly, with minimal fees and no intermediaries.',
   },
   {
     icon: '🔒',
     title: 'xDINAR Staking',
-    desc: 'Lock tokens, earn competitive yield. Rewards distributed automatically via smart contract.',
+    desc: 'Lock your $xDINAR and earn staking rewards, distributed automatically via smart contract.',
   },
   {
     icon: '💸',
     title: 'xDINAR Lending',
-    desc: 'Use $xDINAR as collateral to borrow, or lend to earn interest — governed by immutable contracts.',
+    desc: 'Use $xDINAR as collateral to borrow other assets, or lend to earn interest — managed by transparent, tamper-proof smart contracts.',
   },
   {
     icon: '💳',
@@ -108,12 +99,12 @@ export const FEATURES = [
   {
     icon: '🗳️',
     title: 'xDINAR Governance',
-    desc: 'Full DAO voting system. Every $xDINAR holder has a voice. 1 token = 1 vote.',
+    desc: 'Progressive DAO governance. Every $xDINAR holder can vote — 1 token = 1 vote, 10% quorum, 67% supermajority for fundamental changes.',
   },
   {
     icon: '🛡️',
     title: 'Security First',
-    desc: 'Independent audit, multi-sig treasury, timelock on admin functions, active bug bounty.',
+    desc: 'Smart contracts undergoing independent audit. All burns and treasury activity verifiable on-chain, with monthly treasury reports.',
   },
 ]
 
@@ -164,12 +155,11 @@ export const HERO_STATS = [
 ]
 
 export const MISSION_ITEMS = [
-  'Shariah-aligned DeFi principles',
-  'Transparent on-chain governance',
-  'Community-first token distribution',
-  'Real-world payment utility',
-  'Deflationary tokenomics model',
-  'Open-source smart contracts',
-  'Accessible to 1.8B Muslim market',
-  'Built on battle-tested BNB Chain',
+  'Build a DeFi ecosystem accessible to users from all backgrounds',
+  'Integrate Dinar values and philosophy into modern protocols',
+  'Drive adoption through locally and globally relevant products',
+  'Create a sustainable tokenomics model',
 ]
+
+// Also reachable via the /whitepaper short link (see next.config.js).
+export const WHITEPAPER_URL = 'https://xdinar-token.gitbook.io/xdinar-token-docs'

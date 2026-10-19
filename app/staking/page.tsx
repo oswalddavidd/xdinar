@@ -7,7 +7,7 @@ import { HowItWorks } from '@/components/staking/HowItWorks'
 export const metadata: Metadata = {
   title: 'Stake $xDINAR — Earn Rewards',
   description:
-    'Stake your $xDINAR tokens and earn competitive APR rewards. Fixed lock period, transparent on-chain staking on BNB Smart Chain.',
+    'Lock your $xDINAR and earn staking rewards. Fixed lock period, transparent on-chain staking on BNB Smart Chain.',
 }
 
 export default function StakingPage() {
@@ -27,7 +27,7 @@ export default function StakingPage() {
             <span className="text-gold-gradient">$xDINAR</span>
           </h1>
           <p className="text-content-muted font-body text-lg max-w-xl mx-auto">
-            Lock your tokens, earn competitive yield. Transparent, on-chain, and fully non-custodial.
+            Lock your $xDINAR and earn staking rewards. Transparent and on-chain.
           </p>
         </div>
 

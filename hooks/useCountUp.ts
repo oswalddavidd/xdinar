@@ -15,13 +15,14 @@ export function useCountUp({
   start = 0,
   decimals = 0,
 }: UseCountUpOptions): { value: string; ref: React.RefObject<HTMLElement> } {
-  const [value, setValue] = useState(start.toFixed(decimals))
+  const [value, setValue] = useState(end.toFixed(decimals))
   const ref = useRef<HTMLElement>(null)
   const hasStarted = useRef(false)
 
   useEffect(() => {
     const el = ref.current
-    if (!el) return
+    if (!el || typeof IntersectionObserver === 'undefined') return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const observer = new IntersectionObserver(
       ([entry]) => {
