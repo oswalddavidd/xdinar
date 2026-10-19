@@ -1,13 +1,13 @@
-import { http, createConfig } from 'wagmi'
-import { bscTestnet } from 'wagmi/chains'
+import { fallback, http } from 'wagmi'
 import { getDefaultConfig } from '@rainbow-me/rainbowkit'
+import { net } from './chains'
 
 export const wagmiConfig = getDefaultConfig({
   appName: 'xDINAR Staking',
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? 'YOUR_PROJECT_ID',
-  chains: [bscTestnet],
+  chains: [net.chain],
   transports: {
-    [bscTestnet.id]: http('https://data-seed-prebsc-1-s1.binance.org:8545'),
+    [net.chain.id]: fallback(net.rpcUrls.map((u) => http(u))),
   },
   ssr: true,
 })

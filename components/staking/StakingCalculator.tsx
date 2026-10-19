@@ -6,15 +6,14 @@ import {
   useReadContract,
   useWriteContract,
   useWaitForTransactionReceipt,
-  useChainId
 } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { motion } from 'framer-motion'
 import { Loader2, CheckCircle2, AlertCircle } from 'lucide-react'
 import { STAKING_ABI, ERC20_APPROVE_ABI } from '@/lib/staking-abi'
+import { net, contractsDeployed } from '@/lib/chains'
+import { SwitchNetworkButton } from './SwitchNetworkButton'
 import {
-  STAKING_CONTRACT_ADDRESS,
-  XDINAR_TOKEN_ADDRESS,
   toTokenUnits,
   fromTokenUnits,
   formatTokenDisplay,
@@ -46,8 +45,8 @@ function getFriendlyError(error: Error): string {
 }
 
 export function StakingCalculator() {
-  const { address, isConnected } = useAccount()
-  const chainId = useChainId()
+  const { address, isConnected, chainId: walletChainId } = useAccount()
+  const wrongNetwork = isConnected && walletChainId !== net.chain.id
   const [amount, setAmount] = useState('')
   const [debouncedAmount, setDebouncedAmount] = useState('')
   const [txStep, setTxStep] = useState<TxStep>('idle')
@@ -56,23 +55,18 @@ export function StakingCalculator() {
   const [approveTxHash, setApproveTxHash] = useState<`0x${string}` | undefined>()
   const [stakeTxHash, setStakeTxHash] = useState<`0x${string}` | undefined>()
 
-  console.log('chainId:', chainId)
-  console.log('contract:', STAKING_CONTRACT_ADDRESS)
-
   useEffect(() => {
     const t = setTimeout(() => setDebouncedAmount(amount), 300)
     return () => clearTimeout(t)
   }, [amount])
 
-  const { data: pool, error: poolError } = useReadContract({
-    address: STAKING_CONTRACT_ADDRESS,
+  const { data: pool } = useReadContract({
+    address: net.stakingAddress,
     abi: STAKING_ABI,
     functionName: 'getPool',
-    query: { refetchInterval: 30_000 },
+    chainId: net.chain.id,
+    query: { enabled: contractsDeployed, refetchInterval: 30_000 },
   })
-
-  console.log('pool data:', pool)
-  console.log('pool error:', poolError)
 
   const isActive = pool?.isActive ?? true
   const lockDuration = pool?.lockDuration ?? 0n
@@ -85,19 +79,21 @@ export function StakingCalculator() {
       : '—'
 
   const { data: balance } = useReadContract({
-    address: XDINAR_TOKEN_ADDRESS,
+    address: net.tokenAddress,
     abi: ERC20_APPROVE_ABI,
     functionName: 'balanceOf',
     args: [address!],
-    query: { enabled: isConnected && !!address, refetchInterval: 15_000 },
+    chainId: net.chain.id,
+    query: { enabled: contractsDeployed && isConnected && !!address, refetchInterval: 15_000 },
   })
 
   const { data: allowance, refetch: refetchAllowance } = useReadContract({
-    address: XDINAR_TOKEN_ADDRESS,
+    address: net.tokenAddress,
     abi: ERC20_APPROVE_ABI,
     functionName: 'allowance',
-    args: [address!, STAKING_CONTRACT_ADDRESS],
-    query: { enabled: isConnected && !!address, refetchInterval: 10_000 },
+    args: [address!, net.stakingAddress!],
+    chainId: net.chain.id,
+    query: { enabled: contractsDeployed && isConnected && !!address, refetchInterval: 10_000 },
   })
 
   const parsedDebounced =
@@ -106,11 +102,12 @@ export function StakingCalculator() {
       : 0n
 
   const { data: previewRewardRaw } = useReadContract({
-    address: STAKING_CONTRACT_ADDRESS,
+    address: net.stakingAddress,
     abi: STAKING_ABI,
     functionName: 'previewReward',
     args: [parsedDebounced],
-    query: { enabled: parsedDebounced > 0n },
+    chainId: net.chain.id,
+    query: { enabled: contractsDeployed && parsedDebounced > 0n },
   })
 
   const { writeContractAsync } = useWriteContract()
@@ -161,10 +158,11 @@ export function StakingCalculator() {
     setErrorMsg('')
     try {
       const hash = await writeContractAsync({
-        address: XDINAR_TOKEN_ADDRESS,
+        address: net.tokenAddress!,
         abi: ERC20_APPROVE_ABI,
         functionName: 'approve',
-        args: [STAKING_CONTRACT_ADDRESS, amountBig],
+        args: [net.stakingAddress!, amountBig],
+        chainId: net.chain.id,
       })
       setApproveTxHash(hash)
     } catch (err) {
@@ -179,10 +177,11 @@ export function StakingCalculator() {
     setErrorMsg('')
     try {
       const hash = await writeContractAsync({
-        address: STAKING_CONTRACT_ADDRESS,
+        address: net.stakingAddress!,
         abi: STAKING_ABI,
         functionName: 'stake',
         args: [amountBig],
+        chainId: net.chain.id,
       })
       setStakeTxHash(hash)
     } catch (err) {
@@ -200,10 +199,6 @@ export function StakingCalculator() {
   }
 
   function renderCTA() {
-    console.log('txStep:', txStep)
-    console.log('needsApproval:', needsApproval)
-    console.log('allowance:', allowance?.toString())
-    console.log('amountBig:', amountBig?.toString())
     if (!isConnected) {
       return (
         <ConnectButton.Custom>
@@ -299,6 +294,33 @@ export function StakingCalculator() {
 
   const showStepHint =
     isConnected && needsApproval && amountBig > 0n && txStep !== 'success' && txStep !== 'error'
+
+  if (!contractsDeployed) {
+    return (
+      <div className="glass-card p-6 sm:p-8 max-w-xl mx-auto text-center">
+        <h2 className="font-display font-bold text-content mb-3" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)' }}>
+          Staking Coming Soon
+        </h2>
+        <p className="text-content-muted font-body text-sm">
+          Staking is not yet available on {net.chain.name}. Check back after launch.
+        </p>
+      </div>
+    )
+  }
+
+  if (wrongNetwork) {
+    return (
+      <div className="glass-card p-6 sm:p-8 max-w-xl mx-auto text-center">
+        <h2 className="font-display font-bold text-content mb-3" style={{ fontSize: 'clamp(1.4rem, 3vw, 2rem)' }}>
+          Wrong Network
+        </h2>
+        <p className="text-content-muted font-body text-sm mb-6">
+          Your wallet is connected to a different network. xDINAR staking runs on {net.chain.name}.
+        </p>
+        <SwitchNetworkButton />
+      </div>
+    )
+  }
 
   return (
     <>

@@ -1,8 +1,6 @@
 import { parseUnits, formatUnits } from 'viem'
 
-export const STAKING_CONTRACT_ADDRESS = '0x8E22876abDCF31Ba3A95d0Ea53D0eD2816d5983B' as `0x${string}`
-// NOTE: Update XDINAR_TOKEN_ADDRESS to the actual ERC20 token contract if different from the proxy
-export const XDINAR_TOKEN_ADDRESS = '0x55e0f92b67dc64159c7f376dfaf5869ff92cd46b' as `0x${string}`
+// Contract addresses and chain live in lib/chains.ts (selected by NEXT_PUBLIC_NETWORK).
 
 export const TOKEN_DECIMALS = 18
 

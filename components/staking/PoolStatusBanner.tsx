@@ -2,16 +2,20 @@
 
 import { useReadContract } from 'wagmi'
 import { STAKING_ABI } from '@/lib/staking-abi'
-import { STAKING_CONTRACT_ADDRESS, bpsToPercent, secondsToDays } from '@/lib/staking-contract'
+import { bpsToPercent, formatLockDuration } from '@/lib/staking-contract'
+import { net, contractsDeployed } from '@/lib/chains'
 import { cn } from '@/lib/utils'
 
 export function PoolStatusBanner() {
   const { data: pool, isLoading } = useReadContract({
-    address: STAKING_CONTRACT_ADDRESS,
+    address: net.stakingAddress,
     abi: STAKING_ABI,
     functionName: 'getPool',
-    query: { refetchInterval: 30_000 },
+    chainId: net.chain.id,
+    query: { enabled: contractsDeployed, refetchInterval: 30_000 },
   })
+
+  if (!contractsDeployed) return null
 
   if (isLoading) {
     return (
@@ -27,7 +31,7 @@ export function PoolStatusBanner() {
   }
 
   const isActive = pool?.isActive ?? false
-  const lockDays = pool ? secondsToDays(pool.lockDuration) : 0
+  const lockStr = pool ? formatLockDuration(pool.lockDuration) : '—'
   const aprStr = pool ? bpsToPercent(pool.aprBasisPoints) : '0.00'
   const maxCap = pool?.maxCap ?? 0n
   const totalStaked = pool?.totalStaked ?? 0n
@@ -51,7 +55,7 @@ export function PoolStatusBanner() {
 
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-body text-content-dim">Lock Period:</span>
-          <span className="text-xs font-body font-semibold text-content">{lockDays}d</span>
+          <span className="text-xs font-body font-semibold text-content">{lockStr}</span>
         </div>
 
         <div className="flex items-center gap-1.5">

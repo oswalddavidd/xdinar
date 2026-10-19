@@ -5,8 +5,9 @@ import { useAccount, useReadContract, useWriteContract, useWaitForTransactionRec
 import { motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { STAKING_ABI } from '@/lib/staking-abi'
+import { net, contractsDeployed } from '@/lib/chains'
+import { SwitchNetworkButton } from './SwitchNetworkButton'
 import {
-  STAKING_CONTRACT_ADDRESS,
   formatTokenDisplay,
   getUnlockDate,
   getCountdown,
@@ -15,18 +16,20 @@ import {
 import { cn } from '@/lib/utils'
 
 export function MyStakes() {
-  const { address, isConnected } = useAccount()
+  const { address, isConnected, chainId: walletChainId } = useAccount()
+  const wrongNetwork = isConnected && walletChainId !== net.chain.id
   const [claimingIndex, setClaimingIndex] = useState<number | null>(null)
   const [claimTxHash, setClaimTxHash] = useState<`0x${string}` | undefined>()
   const [countdowns, setCountdowns] = useState<string[]>([])
   const [progresses, setProgresses] = useState<number[]>([])
 
   const { data: stakes, refetch } = useReadContract({
-    address: STAKING_CONTRACT_ADDRESS,
+    address: net.stakingAddress,
     abi: STAKING_ABI,
     functionName: 'getUserStakes',
     args: [address!],
-    query: { enabled: isConnected && !!address, refetchInterval: 15_000 },
+    chainId: net.chain.id,
+    query: { enabled: contractsDeployed && isConnected && !!address, refetchInterval: 15_000 },
   })
 
   const { writeContractAsync } = useWriteContract()
@@ -56,7 +59,7 @@ export function MyStakes() {
     return () => clearInterval(interval)
   }, [stakes])
 
-  if (!isConnected) return null
+  if (!isConnected || !contractsDeployed) return null
 
   const stakeList = stakes ?? []
 
@@ -137,15 +140,18 @@ export function MyStakes() {
                 </div>
 
                 {!stake.claimed && (
-                  unlocked ? (
+                  wrongNetwork ? (
+                    <SwitchNetworkButton compact />
+                  ) : unlocked ? (
                     <button
                       onClick={async () => {
                         setClaimingIndex(i)
                         try {
                           const hash = await writeContractAsync({
-                            address: STAKING_CONTRACT_ADDRESS,
+                            address: net.stakingAddress!,
                             abi: STAKING_ABI,
                             functionName: 'unstake',
+                            chainId: net.chain.id,
                             args: [BigInt(i)],
                           })
                           setClaimTxHash(hash)

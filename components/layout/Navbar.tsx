@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { NAV_LINKS } from '@/lib/constants'
 import { useScrollSpy } from '@/hooks/useScrollSpy'
+import { isTestnet } from '@/lib/chains'
 import { cn } from '@/lib/utils'
 
 const SECTION_IDS = NAV_LINKS.filter((l) => l.href.startsWith('#')).map((l) => l.href.replace('#', ''))
@@ -22,6 +23,17 @@ function Logo({ small = false }: { small?: boolean }) {
       <span className={cn('font-display font-bold text-gold-gradient', small ? 'text-xs' : 'text-sm hidden sm:block')}>
         xDINAR
       </span>
+      {isTestnet && (
+        <span
+          className={cn(
+            'rounded-full border border-amber-400/40 bg-amber-400/10 font-mono font-semibold text-amber-300 tracking-wider leading-none',
+            small ? 'px-1.5 py-0.5 text-[8px]' : 'px-2 py-1 text-[9px]'
+          )}
+          title="Connected to BNB Smart Chain Testnet. Tokens have no real value."
+        >
+          TESTNET
+        </span>
+      )}
     </div>
   )
 }
@@ -31,6 +43,19 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const activeId = useScrollSpy(SECTION_IDS, 80)
   const pathname = usePathname()
+  const router = useRouter()
+  const isHome = pathname === '/'
+
+  // Arriving on the homepage from another page with a section hash (e.g. /#about):
+  // wait for the hero's ScrollTrigger pin to settle, then scroll to the section.
+  useEffect(() => {
+    if (!isHome || !window.location.hash) return
+    const id = window.location.hash.slice(1)
+    const t = setTimeout(() => {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 300)
+    return () => clearTimeout(t)
+  }, [isHome])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80)
@@ -52,12 +77,21 @@ export function Navbar() {
     }
     e.preventDefault()
     setMobileOpen(false)
+    if (!isHome) {
+      router.push(`/${href}`)
+      return
+    }
     const el = document.getElementById(href.replace('#', ''))
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+  // Section anchors only exist on the homepage; elsewhere link back to them.
+  function resolveHref(href: string) {
+    return href.startsWith('#') && !isHome ? `/${href}` : href
+  }
+
   function isLinkActive(href: string) {
-    if (href.startsWith('#')) return activeId === href.replace('#', '')
+    if (href.startsWith('#')) return isHome && activeId === href.replace('#', '')
     return pathname === href
   }
 
@@ -69,7 +103,7 @@ export function Navbar() {
         style={{ opacity: scrolled ? 0 : 1, pointerEvents: scrolled ? 'none' : 'auto' }}
       >
         <nav className="max-w-7xl mx-auto px-6 h-20 flex items-center relative">
-          <a href="#home" onClick={(e) => handleNavClick(e, '#home')} aria-label="xDINAR home">
+          <a href={resolveHref('#home')} onClick={(e) => handleNavClick(e, '#home')} aria-label="xDINAR home">
             <Logo />
           </a>
 
@@ -79,7 +113,7 @@ export function Navbar() {
               return (
                 <li key={link.href}>
                   <a
-                    href={link.href}
+                    href={resolveHref(link.href)}
                     onClick={(e) => handleNavClick(e, link.href)}
                     className={cn(
                       'relative block px-3 py-2 text-sm font-body transition-colors duration-200 rounded hover:text-gold',
@@ -120,7 +154,7 @@ export function Navbar() {
         }}
       >
         <nav className="flex items-center gap-4 px-5 h-14 rounded-full bg-bg-base/85 backdrop-blur-2xl border border-gold/20 shadow-xl shadow-black/40 whitespace-nowrap">
-          <a href="#home" onClick={(e) => handleNavClick(e, '#home')} aria-label="xDINAR home">
+          <a href={resolveHref('#home')} onClick={(e) => handleNavClick(e, '#home')} aria-label="xDINAR home">
             <Logo small />
           </a>
 
@@ -130,7 +164,7 @@ export function Navbar() {
               return (
                 <li key={link.href}>
                   <a
-                    href={link.href}
+                    href={resolveHref(link.href)}
                     onClick={(e) => handleNavClick(e, link.href)}
                     className={cn(
                       'block px-2.5 py-1.5 text-xs font-body transition-colors duration-200 rounded-full',
@@ -177,7 +211,7 @@ export function Navbar() {
               return (
                 <li key={link.href}>
                   <a
-                    href={link.href}
+                    href={resolveHref(link.href)}
                     onClick={(e) => handleNavClick(e, link.href)}
                     className={cn(
                       'block w-full px-4 py-3 rounded-lg text-sm font-body transition-colors duration-200',
